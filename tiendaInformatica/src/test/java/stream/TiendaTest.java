@@ -273,70 +273,89 @@ class TiendaTest {
 
     @Test
     void test11() {
-
+// 11. Lista el nombre y el precio del producto más caro
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        List<String> prodCaro = listProd.stream().max(Comparator.comparing(Producto::getPrecio)).
+                map(prod -> prod.getNombre() + " - " + prod.getPrecio()).
+                stream().toList();
 
+        prodCaro.forEach(System.out::println);
     }
 
 
     @Test
     void test12() {
-
+//12. Lista el nombre de todos los productos del fabricante cuyo código de fabricante es igual a 2.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        List<String> listCod2 = listProd.stream().
+                filter(prod -> prod.getFabricante().getIdFabricante().equals(2)).
+                map(producto -> producto.getNombre() + " - " + producto.getFabricante().getIdFabricante()).
+                toList();
+        listCod2.forEach(System.out::println);
     }
 
 
     @Test
     void test13() {
-
+//13. Lista el nombre de los productos que tienen un precio menor o igual a 120€.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        List<String> prodPrecioMenos120 = listProd.stream().
+                filter(prod -> prod.getPrecio() <= 120).
+                map(prod -> prod.getNombre() + " - " + prod.getPrecio()).
+                toList();
+        prodPrecioMenos120.forEach(System.out::println);
     }
 
 
     @Test
     void test14() {
-
+//14. Lista los productos que tienen un precio mayor o igual a 400€.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        List<String> listPrecioMayor400 = listProd.stream().filter(prod -> prod.getPrecio() >= 400).
+        map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
 
+        listPrecioMayor400.forEach(System.out::println);
     }
 
 
     @Test
     void test15() {
-
+// 15. Lista todos los productos que tengan un precio entre 80€ y 300€.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        List<String> listprecioEntre80Y300 = listProd.stream().
+        filter(prod -> prod.getPrecio() >= 80 && prod.getPrecio() <= 300).
+        map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
 
+        listprecioEntre80Y300.forEach(System.out::println);
     }
 
 
     @Test
     void test16() {
-
+//16. Lista todos los productos que tengan un precio mayor que 200€ y que el código de fabricante sea igual a 6.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        List<String> precioMayor200Codigo6 = listProd.stream().
+                filter(prod -> prod.getPrecio() > 200 && prod.getFabricante().getIdFabricante() == 6).
+                map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
+
+        precioMayor200Codigo6.forEach(System.out::println);
 
     }
 
 
     @Test
     void test17() {
-
+// 17. Lista todos los productos donde el código de fabricante sea 1, 3 o 5 utilizando un Set de codigos de fabricantes
+// para filtrar.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        //List<String> prodCod135
 
     }
 
