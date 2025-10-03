@@ -383,7 +383,7 @@ class TiendaTest {
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
         List<String> fabEmpiezaPorS = listFab.stream().
-                filter(f -> f.getNombre().substring(0).equals("S"))
+                filter(f -> f.getNombre().toUpperCase().startsWith("S"))
                 .map(Fabricante::getNombre).toList();
         fabEmpiezaPorS.forEach(System.out::println);
     }
@@ -411,7 +411,7 @@ class TiendaTest {
         List<Producto> listProd = productosDAO.findAll();
 
         List<String> portatilesMenoresDe150 = listProd.stream().
-                filter(prod -> prod.getNombre().contains("Portátil") && prod.getPrecio() < 150).
+                filter(prod -> prod.getNombre().contains("Monitor") && prod.getPrecio() < 150).
                 map(p -> p.getNombre() + " - " + p.getPrecio() ).
                 toList();
 
@@ -474,7 +474,7 @@ class TiendaTest {
         List<Producto> listProd = productosDAO.findAll();
 
         List<String> prodFabCrucialMayor200 = listProd.stream().
-                filter(prod -> prod.getFabricante().getNombre().equals("Crucial")
+                filter(prod -> "Crucial".equals(prod.getFabricante().getNombre())
                     && prod.getPrecio() > 200).
                 map(prod -> prod.getNombre() + " - " + prod.getPrecio()).
                 toList();
@@ -513,10 +513,11 @@ class TiendaTest {
 //27. Devuelve un listado con el nombre de producto, precio y nombre de fabricante, de todos los productos
 //que tengan un precio mayor o igual a 180€. Ordene el resultado en primer lugar por el precio (en orden descendente)
 //y en segundo lugar por el nombre.
-        /*
+/*
         List<String> listaFiltrada = listProd.stream().
-                filter().
-                map().
+                filter(p -> p.getPrecio()>= 180).
+                sorted(Comparator.comparing(Producto::getPrecio,Comparator.reverseOrder()).thenComparing(Producto::getNombre)).
+                map(pro -> String.).
                 toList();
 */
     }
@@ -527,18 +528,28 @@ class TiendaTest {
 
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
+        listFab.
+                forEach(fab -> {
+                    System.out.println("Fabricante: " + fab.getNombre());
+                    System.out.println("\t Productos");
+                    if ((fab.getProductos() != null) && (!fab.getProductos().isEmpty()))
+                        fab.getProductos().forEach(p -> System.out.println(p.getNombre()));
+
+                });
 
     }
 
 
     @Test
     void test29() {
-
+//29. Devuelve un listado donde sólo aparezcan aquellos fabricantes que no tienen ningún producto asociado.
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
-
+        List<String> fabSinProd = listFab.stream().
+                filter(fabricante -> fabricante.getProductos() != null && fabricante.getProductos().isEmpty()).
+                map(fab -> fab.getNombre() + " - " + fab.getProductos()).
+                toList();
+        fabSinProd.forEach(System.out::println);
     }
 
 
@@ -547,8 +558,7 @@ class TiendaTest {
 
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        System.out.print("");
     }
 
 
