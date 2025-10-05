@@ -2,8 +2,10 @@ package stream;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
+import org.hibernate.persister.collection.mutation.UpdateRowsCoordinator;
 import org.iesbelen.tiendainformatica.dao.FabricanteDAO;
 import org.iesbelen.tiendainformatica.dao.ProductoDAO;
 import org.iesbelen.tiendainformatica.entity.Fabricante;
@@ -12,6 +14,8 @@ import org.iesbelen.tiendainformatica.entity.Producto;
 import org.iesbelen.tiendainformatica.dao.ProductoDAOImpl;
 import org.iesbelen.tiendainformatica.util.JPAUtil;
 import org.junit.jupiter.api.*;
+
+import static java.util.Comparator.comparing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -33,35 +37,57 @@ class TiendaTest {
             // Creación de fabricantes y productos
             Fabricante asus = new Fabricante("Asus");
             fabricantesDAO.create(asus);
-            productosDAO.create(new Producto(asus, "Monitor 27 LED Full HD", 199.25));
-            productosDAO.create(new Producto(asus, "Monitor 24 LED Full HD", 119.99));
+            Producto producto1 = new Producto(asus, "Monitor 27 LED Full HD", 199.25);
+            productosDAO.create(producto1);
+            asus.addProducto(producto1);
+            Producto producto2 = new Producto(asus, "Monitor 24 LED Full HD", 119.99);
+            productosDAO.create(producto2);
+            asus.addProducto(producto2);
 
             Fabricante lenovo = new Fabricante("Lenovo");
             fabricantesDAO.create(lenovo);
-            productosDAO.create(new Producto(lenovo, "Portátil IdeaPad 320", 359.65));
-            productosDAO.create(new Producto(lenovo, "Portátil Yoga 520", 452.79));
+            producto1 = new Producto(lenovo, "Portátil IdeaPad 320", 359.65);
+            productosDAO.create(producto1);
+            lenovo.addProducto(producto1);
+            producto2 = new Producto(lenovo, "Portátil Yoga 520", 452.79);
+            productosDAO.create(producto2);
+            lenovo.addProducto(producto2);
 
             Fabricante hp = new Fabricante("Hewlett-Packard");
             fabricantesDAO.create(hp);
-            productosDAO.create(new Producto(hp, "Impresora HP Deskjet 3720", 59.99));
-            productosDAO.create(new Producto(hp, "Impresora HP Laserjet Pro M26nw", 111.86));
+            producto1 = new Producto(hp, "Impresora HP Deskjet 3720", 59.99);
+            productosDAO.create(producto1);
+            hp.addProducto(producto1);
+            producto2 = new Producto(hp, "Impresora HP Laserjet Pro M26nw", 111.86);
+            productosDAO.create(producto2);
+            hp.addProducto(producto2);
 
             Fabricante samsung = new Fabricante("Samsung");
             fabricantesDAO.create(samsung);
-            productosDAO.create(new Producto(samsung, "Disco SSD 1 TB", 72.99));
+            producto1 = new Producto(samsung, "Disco SSD 1 TB", 72.99);
+            productosDAO.create(producto1);
+            samsung.addProducto(producto1);
 
             Fabricante seagate = new Fabricante("Seagate");
             fabricantesDAO.create(seagate);
-            productosDAO.create(new Producto(seagate, "Disco duro SATA3 1TB", 38.49));
+            producto1 = new Producto(seagate, "Disco duro SATA3 1TB", 38.49);
+            productosDAO.create(producto1);
+            seagate.addProducto(producto1);
 
             Fabricante crucial = new Fabricante("Crucial");
             fabricantesDAO.create(crucial);
-            productosDAO.create(new Producto(crucial, "GeForce GTX 1080 Xtreme", 611.55));
-            productosDAO.create(new Producto(crucial, "Memoria RAM DDR4 8GB", 24.19));
+            producto1 = new Producto(crucial, "GeForce GTX 1080 Xtreme", 611.55);
+            productosDAO.create(producto1);
+            crucial.addProducto(producto1);
+            producto2 = new Producto(crucial, "Memoria RAM DDR4 8GB", 24.19);
+            productosDAO.create(producto2);
+            crucial.addProducto(producto2);
 
             Fabricante gigabyte = new Fabricante("Gigabyte");
             fabricantesDAO.create(gigabyte);
-            productosDAO.create(new Producto(gigabyte, "GeForce GTX 1050Ti", 319.19));
+            producto1 = new Producto(gigabyte, "GeForce GTX 1050Ti", 319.19);
+            productosDAO.create(producto1);
+            gigabyte.addProducto(producto1);
 
             fabricantesDAO.create(new Fabricante("Huawei"));
             fabricantesDAO.create(new Fabricante("Xiaomi"));
@@ -132,11 +158,10 @@ class TiendaTest {
         //TODO STREAMS
 
     }
-    
 
     @Test
     void test1() {
-
+//1. Lista los nombres y los precios de todos los productos de la tabla producto
         List<Producto> listProd = productosDAO.findAll();
 
        List<String> listaNombrePrecio = listProd.stream().map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
@@ -194,11 +219,11 @@ class TiendaTest {
     void test5() {
 //5. Lista el código de los fabricantes que tienen productos.
         List<Fabricante> listFab = fabricantesDAO.findAll();
-// NO ESTÁ BIEN
+
         List<Integer> listCodFabConProductos = listFab.stream().filter(fab -> (fab.getProductos() != null) && (!fab.getProductos().isEmpty()))
             .map(Fabricante::getIdFabricante).toList();
         listCodFabConProductos.forEach(System.out::println);
-// NO ESTÁ BIEN
+
     }
 
 
@@ -206,7 +231,7 @@ class TiendaTest {
     void test6() {
 //6. Lista los nombres de los fabricantes ordenados de forma descendente.
         List<Fabricante> listFab = fabricantesDAO.findAll();
-        List<String> listaOrden = listFab.stream().sorted(Comparator.comparing(Fabricante::getNombre).reversed())
+        List<String> listaOrden = listFab.stream().sorted(comparing(Fabricante::getNombre).reversed())
                 .map(Fabricante::getNombre).toList();
 
         listaOrden.forEach(System.out::println);
@@ -221,8 +246,8 @@ class TiendaTest {
         List<Producto> listProd = productosDAO.findAll();
 
         List<String> listNomOrdAscYDesc = listProd.stream().
-                sorted(Comparator.comparing(Producto::getNombre).
-                        thenComparing(Comparator.comparing(Producto::getPrecio).
+                sorted(comparing(Producto::getNombre).
+                        thenComparing(comparing(Producto::getPrecio).
                                 reversed())).
                 map(Producto::getNombre).toList();
 
@@ -265,7 +290,7 @@ class TiendaTest {
 // 10. Lista el nombre y el precio del producto más barato
         List<Producto> listProd = productosDAO.findAll();
 
-        Producto productoMasBarato = listProd.stream().min(Comparator.comparing(Producto::getPrecio)).orElse(null);
+        Producto productoMasBarato = listProd.stream().min(comparing(Producto::getPrecio)).orElse(null);
         if(productoMasBarato != null) {
             System.out.println(productoMasBarato.getNombre() + " - " + productoMasBarato.getPrecio());
         }
@@ -277,7 +302,7 @@ class TiendaTest {
 // 11. Lista el nombre y el precio del producto más caro
         List<Producto> listProd = productosDAO.findAll();
 
-        List<String> prodCaro = listProd.stream().max(Comparator.comparing(Producto::getPrecio)).
+        List<String> prodCaro = listProd.stream().max(comparing(Producto::getPrecio)).
                 map(prod -> prod.getNombre() + " - " + prod.getPrecio()).
                 stream().toList();
 
@@ -429,8 +454,8 @@ class TiendaTest {
 
         List<String> prodMayorIgual180 = listProd.stream().
                 filter(p -> p.getPrecio() >= 180).
-                sorted(Comparator.comparing(Producto::getPrecio).reversed().
-                        thenComparing(Comparator.comparing(Producto::getNombre))).
+                sorted(comparing(Producto::getPrecio).reversed().
+                        thenComparing(comparing(Producto::getNombre))).
                 map(prod -> prod.getNombre() + " - " + prod.getPrecio()).
                 toList();
         prodMayorIgual180.forEach(System.out::println);
@@ -444,7 +469,7 @@ class TiendaTest {
         List<Producto> listProd = productosDAO.findAll();
 
         List<String> listaProdPrecNomOrdenado = listProd.stream()
-                .sorted(Comparator.comparing(prod -> prod.getFabricante().getNombre()))
+                .sorted(comparing(prod -> prod.getFabricante().getNombre()))
                 .map(prod -> prod.getPrecio() + " - " +
                         prod.getNombre() + " - " +
                         prod.getFabricante().getNombre())
@@ -459,7 +484,7 @@ class TiendaTest {
         List<Producto> listProd = productosDAO.findAll();
 
         List<String> prodMasCaro = listProd.stream().
-                max(Comparator.comparing(Producto::getPrecio)).
+                max(comparing(Producto::getPrecio)).
                 stream().
                 map(prod -> prod.getNombre() +
                         " - " + prod.getPrecio() +
@@ -513,13 +538,16 @@ class TiendaTest {
 //27. Devuelve un listado con el nombre de producto, precio y nombre de fabricante, de todos los productos
 //que tengan un precio mayor o igual a 180€. Ordene el resultado en primer lugar por el precio (en orden descendente)
 //y en segundo lugar por el nombre.
-/*
-        List<String> listaFiltrada = listProd.stream().
-                filter(p -> p.getPrecio()>= 180).
-                sorted(Comparator.comparing(Producto::getPrecio,Comparator.reverseOrder()).thenComparing(Producto::getNombre)).
-                map(pro -> String.).
-                toList();
-*/
+
+        List<Producto> productosFiltrados = listProd.stream()
+                .filter(p -> p.getPrecio() >= 180)
+                .sorted(comparing(Producto::getPrecio).reversed().thenComparing(Producto::getNombre))
+                .toList();
+        System.out.println("Producto                Precio             Fabricante");
+        System.out.println("-----------------------------------------------------");
+        productosFiltrados.forEach(p ->{
+                System.out.printf("%-23s|%.2f|%s%n", p.getNombre(), p.getPrecio(),p.getFabricante().getNombre());
+        });
     }
 
 
@@ -528,13 +556,11 @@ class TiendaTest {
 
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        listFab.
-                forEach(fab -> {
+        listFab.forEach(fab -> {
                     System.out.println("Fabricante: " + fab.getNombre());
                     System.out.println("\t Productos");
                     if ((fab.getProductos() != null) && (!fab.getProductos().isEmpty()))
                         fab.getProductos().forEach(p -> System.out.println(p.getNombre()));
-
                 });
 
     }
@@ -547,7 +573,7 @@ class TiendaTest {
 
         List<String> fabSinProd = listFab.stream().
                 filter(fabricante -> fabricante.getProductos() != null && fabricante.getProductos().isEmpty()).
-                map(fab -> fab.getNombre() + " - " + fab.getProductos()).
+                map(Fabricante::getNombre).
                 toList();
         fabSinProd.forEach(System.out::println);
     }
@@ -555,80 +581,113 @@ class TiendaTest {
 
     @Test
     void test30() {
-
+//30. Calcula el número total de productos que hay en la tabla productos. Utiliza la api de stream.
         List<Producto> listProd = productosDAO.findAll();
 
-        System.out.print("");
+        long cantidadProducost = listProd.stream().count();
+        System.out.println("Cantidad de productos: " + cantidadProducost);
     }
 
 
 
     @Test
     void test31() {
-
+//31. Calcula el número de fabricantes con productos, utilizando un stream de Productos.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        long fabricantes = listProd.stream().map(Producto::getFabricante).distinct().count();
+        System.out.println("Fabricantes: " + fabricantes);
     }
 
 
     @Test
     void test32() {
-
+//32. Calcula la media del precio de todos los productos
         List<Producto> listProd = productosDAO.findAll();
+        double precioTodosProductos = listProd.stream().mapToDouble(Producto::getPrecio).average().orElse(0);
 
-        //TODO STREAMS
-
+        System.out.println("Media de precios: " + precioTodosProductos);
     }
 
 
     @Test
     void test33() {
-
+//33. Calcula el precio más barato de todos los productos. No se puede utilizar ordenación de stream.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        double precioMasBajo = listProd.stream().mapToDouble(Producto::getPrecio).min().orElse(0);
 
+        System.out.println("Precio más bajo: " + precioMasBajo);
     }
 
 
     @Test
     void test34() {
-
+//34. Calcula la suma de los precios de todos los productos.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        double sumaPrecios = listProd.stream().mapToDouble(Producto::getPrecio).sum();
+
+        System.out.println("Suma de precios: " + sumaPrecios);
 
     }
 
 
     @Test
     void test35() {
-
+//35. Calcula el número de productos que tiene el fabricante Asus.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        long CantidadProdAsus = listProd.stream().filter(p -> "Asus".equals(p.getFabricante().getNombre())).count();
+
+        System.out.println("Cantidad de productos de Asus: " + CantidadProdAsus);
 
     }
 
 
     @Test
     void test36() {
-
+//36. Calcula la media del precio de todos los productos del fabricante Asus.
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        double mediaPrecios = listProd.stream().
+                filter(p -> "Asus".equals(p.getFabricante().getNombre())).
+                mapToDouble(Producto::getPrecio).average().orElse(0);
+
+        System.out.println("Media de precios de Asus: " + mediaPrecios);
 
     }
 
 
     @Test
     void test37() {
-
+//37. Muestra el precio máximo, precio mínimo, precio medio y el número total de productos que tiene
+//el fabricante Crucial. Realízalo en 1 solo stream principal. Utiliza reduce con Double[] como "acumulador".
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
+        // Acumulador: [0] = count, [1] = sum, [2] = min, [3] = max
+        Double[] stats = listProd.stream()
+                .filter(p -> p.getFabricante().getNombre().equals("Crucial"))
+                .map(Producto::getPrecio)
+                .reduce(new Double[]{0.0, 0.0, Double.MAX_VALUE, Double.MIN_VALUE},
+                        (acumulador, precio) -> {
+                            acumulador[0]++; // count
+                            acumulador[1] += precio; // sum
+                            acumulador[2] = Math.min(acumulador[2], precio); // min
+                            acumulador[3] = Math.max(acumulador[3], precio); // max
+                            return acumulador;
+                        },
+                        (acc1, acc2) -> acc1 // Combiner no es necesario en secuencial
+                );
+
+        double count = stats[0];
+        double sum = stats[1];
+        double min = stats[2];
+        double max = stats[3];
+        double avg = (count > 0) ? sum / count : 0.0;
+
+        System.out.printf("Stats para Crucial: Total=%d, Mín=%.2f, Máx=%.2f, Media=%.2f%n",
+                (int) count, min, max, avg);
 
     }
 
@@ -645,47 +704,78 @@ class TiendaTest {
 
     @Test
     void test39() {
-
+//39. Muestra el precio máximo, precio mínimo y precio medio de los productos de cada uno de los fabricantes.
+//El resultado mostrará el nombre del fabricante junto con los datos que se solicitan. Deben aparecer los fabricantes
+//que no tienen productos.
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
+        listFab.forEach(f -> {
+            if (f.getProductos() != null && !f.getProductos().isEmpty()) {
+                DoubleSummaryStatistics stats = f.getProductos().stream().mapToDouble(Producto::getPrecio).summaryStatistics();
+                System.out.printf("fabricante: %s Min: %.2f, Max: %.2f Media: %.2f %n",f.getNombre(), stats.getMin(), stats.getMax(), stats.getAverage());
+            }
+        });
+
 
     }
 
 
     @Test
     void test40() {
+//40. Muestra el precio máximo, precio mínimo, precio medio y el número total de productos de los fabricantes
+//que tienen un precio medio superior a 200€. No es necesario mostrar el nombre del fabricante,
+//con el código del fabricante es suficiente.
+        List<Producto> listProd = productosDAO.findAll();
 
-        List<Fabricante> listFab = fabricantesDAO.findAll();
+        Map<Fabricante, DoubleSummaryStatistics> stasFabricante = listProd.stream().
+                collect(Collectors.groupingBy(
+                        Producto::getFabricante,
+                        Collectors.summarizingDouble(Producto::getPrecio)));
 
-        //TODO STREAMS
+        stasFabricante.entrySet().stream().
+                filter(entry -> entry.getValue().getMin() > 200).
+                peek(entry -> {
+                   System.out.println("Fabricante ID: %d%n" + entry.getKey().getIdFabricante());
+                   DoubleSummaryStatistics stats = entry.getValue();
+                   System.out.printf("Total %d, Min: %.2f, Max %.2f, Media: %.2f%n",stats.getCount(), stats.getMin(), stats.getMax(), stats.getAverage());
+                }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     }
 
 
     @Test
     void test41() {
-
+//41. Devuelve un listado con los nombres de los fabricantes que tienen 2 o más productos.
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
+        List<String> listaFabFiltrado = listFab.stream().
+                filter(f -> f.getProductos() != null && 2 == f.getProductos().size()).
+                map(Fabricante::getNombre).toList();
 
+        listaFabFiltrado.forEach(System.out::println);
     }
 
 
     @Test
     void test42() {
+//42. Devuelve un listado con los nombres de los fabricantes y el número de productos que tiene cada uno
+//con un precio superior o igual a 220 €. Ordenado de mayor a menor número de productos.
+        List<Producto> listprod = productosDAO.findAll();
 
-        List<Fabricante> listFab = fabricantesDAO.findAll();
+        Map<String,Long> fabYprods = listprod.stream().
+                filter(p -> p.getPrecio() >= 220).
+                collect(Collectors.groupingBy(p -> p.getFabricante().getNombre(), Collectors.counting()));
 
-        //TODO STREAMS
-
+        fabYprods.entrySet().stream().
+                sorted(Map.Entry.<String,Long>comparingByValue().reversed()).
+                forEach(entry -> System.out.printf("Fabricante: %s, #Productos >= 220€: %d%n", entry.getKey(), entry.getValue() ));
     }
 
 
     @Test
     void test43() {
-
+//43. Devuelve un listado con los nombres de los fabricantes donde la suma del precio de todos sus productos
+// es superior a 500 €
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
         //TODO STREAMS
@@ -695,7 +785,8 @@ class TiendaTest {
 
     @Test
     void test44() {
-
+//44. Devuelve un listado con los nombres de los fabricantes donde la suma del precio de todos sus productos
+//es superior a 600 €. Ordenado de menor a mayor por cuantía de precio de los productos.
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
         //TODO STREAMS
@@ -705,7 +796,9 @@ class TiendaTest {
 
     @Test
     void test45() {
-
+//45. Devuelve un listado con el nombre del producto más caro que tiene cada fabricante.
+//El resultado debe tener tres columnas: nombre del producto, precio y nombre del fabricante.
+//El resultado tiene que estar ordenado alfabéticamente de menor a mayor por el nombre del fabricante.
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
         //TODO STREAMS
