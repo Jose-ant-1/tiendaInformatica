@@ -3,6 +3,7 @@ package stream;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.persistence.EntityManager;
 import org.hibernate.persister.collection.mutation.UpdateRowsCoordinator;
@@ -163,12 +164,14 @@ class TiendaTest {
     void test1() {
 //1. Lista los nombres y los precios de todos los productos de la tabla producto
         List<Producto> listProd = productosDAO.findAll();
-
+/*
        List<String> listaNombrePrecio = listProd.stream().
                map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
 
        listaNombrePrecio.forEach(System.out::println);
-
+*/
+       List<String> lista = listProd.stream().map(p -> p.getNombre() + " - " + p.getPrecio()).toList();
+       lista.forEach(System.out::println);
     }
 
 
@@ -176,7 +179,7 @@ class TiendaTest {
     void test2() {
         //2. Devuelve una lista de Producto completa con el precio de euros convertido a dólares.
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> listaEruoADolar = listProd.stream().
                 map(prod -> prod.getNombre() +
                         " - Fab= " + prod.getFabricante().getIdFabricante() +
@@ -184,7 +187,9 @@ class TiendaTest {
                         " - PrecioDolar= " + new BigDecimal(prod.getPrecio() * 1.17))
                 .toList();
         listaEruoADolar.forEach(System.out::println);
-
+*/
+        List<String> lista = listProd.stream().map(p -> p.getIdProducto() + " - " +  p.getPrecio() * 1.17).toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -193,12 +198,14 @@ class TiendaTest {
         //3. Lista los nombres y los precios de todos los productos, convirtiendo los nombres a mayúscula.
 
         List<Producto> listProd = productosDAO.findAll();
+        /*
         List<String> listaNombrePrecioMayus = listProd.stream()
                 .map(prod -> prod.getNombre().toUpperCase() + " - " + prod.getPrecio())
                 .toList();
         listaNombrePrecioMayus.forEach(System.out::println);
-
-
+        */
+        List<String> lista = listProd.stream().map(p -> p.getNombre().toUpperCase() + " - " + p.getPrecio()).toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -207,12 +214,15 @@ class TiendaTest {
 //4. Lista el nombre de todos los fabricantes y a continuación en mayúsculas los dos primeros caracteres del
 //nombre del fabricante.
         List<Fabricante> listFab = fabricantesDAO.findAll();
+        /*
         List<String> listaNomFab2PrimerCaracter = listFab.stream()
             .map(fab -> fab.getNombre().substring(0,2).toUpperCase())
             .toList();
 
         listaNomFab2PrimerCaracter.forEach(System.out::println);
-
+        */
+        List<String> lista = listFab.stream().map( f -> f.getNombre().toUpperCase().substring(0,2)).toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -220,12 +230,14 @@ class TiendaTest {
     void test5() {
 //5. Lista el código de los fabricantes que tienen productos.
         List<Fabricante> listFab = fabricantesDAO.findAll();
-
+/*
         List<Integer> listCodFabConProductos = listFab.stream().
                 filter(fab -> (fab.getProductos() != null) && (!fab.getProductos().isEmpty()))
             .map(Fabricante::getIdFabricante).toList();
         listCodFabConProductos.forEach(System.out::println);
-
+*/
+        Stream<Integer> lista = listFab.stream().filter(f -> f.getProductos() != null && !f.getProductos().isEmpty()).map(Fabricante::getIdFabricante);
+        lista.forEach(System.out::println);
     }
 
 
@@ -233,11 +245,14 @@ class TiendaTest {
     void test6() {
 //6. Lista los nombres de los fabricantes ordenados de forma descendente.
         List<Fabricante> listFab = fabricantesDAO.findAll();
+        /*
         List<String> listaOrden = listFab.stream().sorted(comparing(Fabricante::getNombre).reversed())
                 .map(Fabricante::getNombre).toList();
 
         listaOrden.forEach(System.out::println);
-
+        */
+        List<String> lista = listFab.stream().sorted(comparing(Fabricante::getNombre).reversed()).map(Fabricante::getNombre).toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -246,7 +261,7 @@ class TiendaTest {
 // 7. Lista los nombres de los productosDAOImpl ordenados en primer lugar por el nombre de forma ascendente y
 // en segundo lugar por el precio de forma descendente.
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> listNomOrdAscYDesc = listProd.stream().
                 sorted(comparing(Producto::getNombre).
                         thenComparing(comparing(Producto::getPrecio).
@@ -254,7 +269,13 @@ class TiendaTest {
                 map(Producto::getNombre).toList();
 
             listNomOrdAscYDesc.forEach(System.out::println);
-
+*/
+    List<String> lista = listProd.stream().
+            sorted(comparing(Producto::getNombre).
+                    thenComparing(Producto::getPrecio).reversed()).
+            map(p -> p.getNombre() + " - " + p.getPrecio())
+            .toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -263,13 +284,15 @@ class TiendaTest {
 //8. Devuelve una lista con los 5 primeros fabricantes.
 
         List<Fabricante> listFab = fabricantesDAO.findAll();
-
+/*
         List<String> lista5PrimerosFab = listFab.stream().
                 limit(5).
                 map(fab -> fab.getIdFabricante() + " - " + fab.getNombre()).toList();
 
         lista5PrimerosFab.forEach(System.out::println);
-
+*/
+        List<String> lista = listFab.stream().limit(5).map(Fabricante::getNombre).toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -279,11 +302,14 @@ class TiendaTest {
 // se debe incluir en la respuesta.
 
         List<Fabricante> listFab = fabricantesDAO.findAll();
-
+/*
         List<String> fabricantes2 = listFab.stream().skip(3).limit(2).
                 map(fab -> fab.getIdFabricante() + " - " + fab.getNombre()).toList();
 
         fabricantes2.forEach(System.out::println);
+ */
+        List<String> lista = listFab.stream().skip(3).limit(2).map(Fabricante::getNombre).toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -291,24 +317,34 @@ class TiendaTest {
     void test10() {
 // 10. Lista el nombre y el precio del producto más barato
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         Producto productoMasBarato = listProd.stream().min(comparing(Producto::getPrecio)).orElse(null);
         if(productoMasBarato != null) {
             System.out.println(productoMasBarato.getNombre() + " - " + productoMasBarato.getPrecio());
         }
-
+*/
+        Producto producto = listProd.stream().min(comparing(Producto::getPrecio)).orElse(null);
+        if (producto != null) {
+            System.out.println("El producto más barato es " + producto.getNombre() + " - " + producto.getPrecio());
+        }
     }
 
     @Test
     void test11() {
 // 11. Lista el nombre y el precio del producto más caro
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> prodCaro = listProd.stream().max(comparing(Producto::getPrecio)).
                 map(prod -> prod.getNombre() + " - " + prod.getPrecio()).
                 stream().toList();
 
         prodCaro.forEach(System.out::println);
+ */
+        Producto producto = listProd.stream().max(comparing(Producto::getPrecio)).orElse(null);
+        if (producto != null) {
+            System.out.println("El producto más caro es" +  producto.getNombre() + " - " + producto.getPrecio());
+        }
+
     }
 
 
@@ -316,12 +352,19 @@ class TiendaTest {
     void test12() {
 //12. Lista el nombre de todos los productos del fabricante cuyo código de fabricante es igual a 2.
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> listCod2 = listProd.stream().
                 filter(prod -> prod.getFabricante().getIdFabricante().equals(2)).
                 map(producto -> producto.getNombre() + " - " + producto.getFabricante().getIdFabricante()).
                 toList();
         listCod2.forEach(System.out::println);
+
+ */
+        List<String> lista = listProd.stream().
+                filter(p -> p.getFabricante().getIdFabricante().equals(2)).
+                map(p -> p.getNombre() + " - " + p.getFabricante().getIdFabricante()).
+                toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -329,12 +372,18 @@ class TiendaTest {
     void test13() {
 //13. Lista el nombre de los productos que tienen un precio menor o igual a 120€.
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> prodPrecioMenos120 = listProd.stream().
                 filter(prod -> prod.getPrecio() <= 120).
                 map(prod -> prod.getNombre() + " - " + prod.getPrecio()).
                 toList();
         prodPrecioMenos120.forEach(System.out::println);
+
+ */
+        List<String> lista = listProd.stream().
+                filter(p -> p.getPrecio() <= 120).
+                map(p -> p.getNombre() + " - " + p.getPrecio()).toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -342,11 +391,17 @@ class TiendaTest {
     void test14() {
 //14. Lista los productos que tienen un precio mayor o igual a 400€.
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> listPrecioMayor400 = listProd.stream().filter(prod -> prod.getPrecio() >= 400).
         map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
 
         listPrecioMayor400.forEach(System.out::println);
+
+ */
+        List<String> lista = listProd.stream().
+                filter(p -> p.getPrecio() >= 400).
+                map(Producto::getNombre).toList();
+    lista.forEach(System.out::println);
     }
 
 
@@ -354,12 +409,18 @@ class TiendaTest {
     void test15() {
 // 15. Lista todos los productos que tengan un precio entre 80€ y 300€.
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> listprecioEntre80Y300 = listProd.stream().
         filter(prod -> prod.getPrecio() >= 80 && prod.getPrecio() <= 300).
         map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
 
         listprecioEntre80Y300.forEach(System.out::println);
+
+ */
+        List<String> lista = listProd.stream().
+                filter(p -> p.getPrecio() >= 80 && p.getPrecio() <= 300).
+                map(p -> p.getPrecio() + " - " + p.getNombre()).toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -367,13 +428,17 @@ class TiendaTest {
     void test16() {
 //16. Lista todos los productos que tengan un precio mayor que 200€ y que el código de fabricante sea igual a 6.
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> precioMayor200Codigo6 = listProd.stream().
                 filter(prod -> prod.getPrecio() > 200 && prod.getFabricante().getIdFabricante() == 6).
                 map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
 
         precioMayor200Codigo6.forEach(System.out::println);
-
+*/
+        List<String> lista = listProd.stream().
+                filter(p -> p.getPrecio() > 200 && p.getFabricante().getIdFabricante().equals(6)).
+                map(p -> p.getNombre() + " - " + p.getPrecio()).toList();
+        lista.forEach(System.out::println);
     }
 
 
