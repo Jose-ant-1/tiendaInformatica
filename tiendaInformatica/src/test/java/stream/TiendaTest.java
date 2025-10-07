@@ -164,7 +164,8 @@ class TiendaTest {
 //1. Lista los nombres y los precios de todos los productos de la tabla producto
         List<Producto> listProd = productosDAO.findAll();
 
-       List<String> listaNombrePrecio = listProd.stream().map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
+       List<String> listaNombrePrecio = listProd.stream().
+               map(prod -> prod.getNombre() + " - " + prod.getPrecio()).toList();
 
        listaNombrePrecio.forEach(System.out::println);
 
@@ -220,7 +221,8 @@ class TiendaTest {
 //5. Lista el código de los fabricantes que tienen productos.
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        List<Integer> listCodFabConProductos = listFab.stream().filter(fab -> (fab.getProductos() != null) && (!fab.getProductos().isEmpty()))
+        List<Integer> listCodFabConProductos = listFab.stream().
+                filter(fab -> (fab.getProductos() != null) && (!fab.getProductos().isEmpty()))
             .map(Fabricante::getIdFabricante).toList();
         listCodFabConProductos.forEach(System.out::println);
 
@@ -726,7 +728,7 @@ class TiendaTest {
 //que tienen un precio medio superior a 200€. No es necesario mostrar el nombre del fabricante,
 //con el código del fabricante es suficiente.
         List<Producto> listProd = productosDAO.findAll();
-
+    //REHACER
         Map<Fabricante, DoubleSummaryStatistics> stasFabricante = listProd.stream().
                 collect(Collectors.groupingBy(
                         Producto::getFabricante,
@@ -739,6 +741,7 @@ class TiendaTest {
                    DoubleSummaryStatistics stats = entry.getValue();
                    System.out.printf("Total %d, Min: %.2f, Max %.2f, Media: %.2f%n",stats.getCount(), stats.getMin(), stats.getMax(), stats.getAverage());
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
 
     }
 
@@ -778,7 +781,12 @@ class TiendaTest {
 // es superior a 500 €
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
+        List<String> nombres = listFab.stream()
+                .filter(f -> f.getProductos() != null && f.getProductos().stream().mapToDouble(Producto::getPrecio).sum() > 500)
+                .map(Fabricante::getNombre)
+                .toList();
+
+        System.out.println("Fabricantes con suma de precios > 500€: " + nombres);
 
     }
 
@@ -789,7 +797,18 @@ class TiendaTest {
 //es superior a 600 €. Ordenado de menor a mayor por cuantía de precio de los productos.
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
+        List<String> nombres = listFab.stream()
+                .filter(f -> f.getProductos() != null && !f.getProductos().isEmpty())
+                .map(f -> new AbstractMap.SimpleEntry<>(
+                        f.getNombre(),
+                        f.getProductos().stream().mapToDouble(Producto::getPrecio).sum()
+                ))
+                .filter(entry -> entry.getValue() > 600)
+                .sorted(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .toList();
+    //REHACER
+        System.out.println("Fabricantes con suma de precios > 600€ (ordenado): " + nombres);
 
     }
 
@@ -801,7 +820,18 @@ class TiendaTest {
 //El resultado tiene que estar ordenado alfabéticamente de menor a mayor por el nombre del fabricante.
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
+        List<String> resultado = listFab.stream()
+                .filter(f -> f.getProductos() != null && !f.getProductos().isEmpty())
+                .sorted(comparing(Fabricante::getNombre))
+                .map(f -> {
+                    Producto masCaro = f.getProductos().stream()
+                            .max(comparing(Producto::getPrecio))
+                            .get();
+                    return String.format("%s - %.2f€ - %s", masCaro.getNombre(), masCaro.getPrecio(), f.getNombre());
+                })
+                .toList();
+
+        resultado.forEach(System.out::println);
 
     }
 }
