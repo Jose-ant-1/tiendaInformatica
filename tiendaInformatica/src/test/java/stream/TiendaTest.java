@@ -446,13 +446,23 @@ class TiendaTest {
     void test17() {
 // 17. Lista todos los productos donde el código de fabricante sea 1, 3 o 5 utilizando un Set de codigos de fabricantes
 // para filtrar.
+
         List<Producto> listProd = productosDAO.findAll();
+        /*
         Set<Integer> codigoFabricanteValido = Set.of(1, 3, 5);
         List<String> prodFab135UsandoSetCodigo = listProd.stream().
                 filter(prod -> codigoFabricanteValido.contains(prod.getFabricante().getIdFabricante())).
                 map(p -> p.getNombre() + " - " + p.getFabricante().getIdFabricante()).toList();
 
         prodFab135UsandoSetCodigo.forEach(System.out::println);
+        */
+        Set<Integer> codigos = Set.of(1,3,5);
+        List<String> lista = listProd.stream().
+                filter(prod -> codigos.contains(prod.getFabricante().getIdFabricante())).
+                map(p -> p.getNombre() + " - " + p.getFabricante().getIdFabricante()).
+                toList();
+        lista.forEach(System.out::println);
+
     }
 
 
@@ -460,11 +470,17 @@ class TiendaTest {
     void test18() {
 // 18. Lista el nombre y el precio de los productos en céntimos.
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> prodEnCentimos = listProd.stream().
                 map(p -> p.getNombre() + " - " + p.getPrecio() * 100).
                 toList();
         prodEnCentimos.forEach(System.out::println);
+
+ */
+        List<String> lista = listProd.stream().
+                map(p -> p.getNombre() + " - " + p.getPrecio() * 100).
+                toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -473,11 +489,18 @@ class TiendaTest {
     void test19() {
 //19. Lista los nombres de los fabricante cuyo nombre empiece por la letra S
         List<Fabricante> listFab = fabricantesDAO.findAll();
-
+/*
         List<String> fabEmpiezaPorS = listFab.stream().
                 filter(f -> f.getNombre().toUpperCase().startsWith("S"))
                 .map(Fabricante::getNombre).toList();
         fabEmpiezaPorS.forEach(System.out::println);
+ */
+        List<String> lista = listFab.stream().
+                filter(f -> f.getNombre() != null && !f.getNombre().isEmpty() && f.getNombre().toUpperCase().startsWith("S")).
+                map(f -> f.getNombre() + " - " + f.getIdFabricante()).
+                toList();
+        lista.forEach(System.out::println);
+
     }
 
 
@@ -486,13 +509,19 @@ class TiendaTest {
 // 20. Devuelve una lista con los productos que contienen la cadena Portátil en el nombre.
 
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> portatiles = listProd.stream().
                 filter(prod -> prod.getNombre().contains("Portátil")).
                 map(Producto::getNombre).
                 toList();
 
         portatiles.forEach(System.out::println);
+ */
+        List<String> lista = listProd.stream().
+                filter(p -> p.getNombre().contains("Portátil")).
+                map(p -> p.getNombre() + " - " + p.getPrecio()).
+                toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -501,14 +530,19 @@ class TiendaTest {
 //21. Devuelve una lista con el nombre de todos los productos que contienen la cadena Monitor en el nombre y
 //tienen un precio inferior a 150 €.
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> portatilesMenoresDe150 = listProd.stream().
                 filter(prod -> prod.getNombre().contains("Monitor") && prod.getPrecio() < 150).
                 map(p -> p.getNombre() + " - " + p.getPrecio() ).
                 toList();
 
         portatilesMenoresDe150.forEach(System.out::println);
-
+ */
+        List<String> lista = listProd.stream().
+                filter(p -> p.getNombre().contains("Monitor") && p.getPrecio() < 150).
+                map(p -> p.getNombre() + " - " + p.getPrecio()).
+                toList();
+        lista.forEach(System.out::println);
     }
 
 
@@ -518,7 +552,7 @@ class TiendaTest {
 //Ordene el resultado en primer lugar por el precio (en orden descendente) y en segundo lugar por
 //el nombre (en orden ascendente).
         List<Producto> listProd = productosDAO.findAll();
-
+/*
         List<String> prodMayorIgual180 = listProd.stream().
                 filter(p -> p.getPrecio() >= 180).
                 sorted(comparing(Producto::getPrecio).reversed().
@@ -526,6 +560,13 @@ class TiendaTest {
                 map(prod -> prod.getNombre() + " - " + prod.getPrecio()).
                 toList();
         prodMayorIgual180.forEach(System.out::println);
+    */
+        List<String> lista = listProd.stream().
+                filter(p -> p.getPrecio() >= 180).
+                sorted(comparing(Producto::getPrecio).reversed().thenComparing(comparing(Producto::getNombre))).
+                map(p -> p.getNombre() + " - " + p.getPrecio()).
+                toList();
+        lista.forEach(System.out::println);
     }
 
 
